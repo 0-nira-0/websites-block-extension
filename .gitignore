@@ -1,0 +1,12 @@
+node_modules
+dist
+.DS_Store
+*.log
+.vite
+
+PLAN.md
+Design Canvas from Just Focus.jsx
+Just Focus (1).html
+Screens from Just Focus.jsx
+Tokens CSS from Just Focus.css
+Tweaks Panel from Just Focus.jsx
