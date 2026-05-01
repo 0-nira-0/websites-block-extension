@@ -33,9 +33,9 @@ export const defaultSites = (): Site[] =>
   }));
 
 export const MOTIVATION_VIDEOS: Record<string, string> = {
-  goggins: "VIDEO_ID_GOGGINS",
-  soft: "VIDEO_ID_SOFT",
-  humor: "VIDEO_ID_HUMOR",
+  goggins: "E9MOhxS46d8",
+  soft: "E9MOhxS46d8",
+  humor: "E9MOhxS46d8",
 };
 
 export const TONE_COPY: Record<string, { eyebrow: string; line1: string; line2: string; line3: string; primary: string; secondary: string; subline: string }> = {
