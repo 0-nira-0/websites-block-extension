@@ -3,6 +3,7 @@ dist
 .DS_Store
 *.log
 .vite
+*.tsbuildinfo
 
 PLAN.md
 Design Canvas from Just Focus.jsx

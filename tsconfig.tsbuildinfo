@@ -1,1 +1,0 @@
-{"root":["./src/background/sw.ts","./src/complete/complete.tsx","./src/complete/main.tsx","./src/popup/app.tsx","./src/popup/main.tsx","./src/redirect/redirect.tsx","./src/redirect/main.tsx"],"version":"5.9.3"}
