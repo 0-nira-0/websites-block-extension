@@ -151,15 +151,30 @@ async function skipPhase(): Promise<void> {
   await advancePhase();
 }
 
+async function reconcileOnBoot(): Promise<void> {
+  const state = await getState();
+  if (state.pomoState.phase !== "idle" && state.pomoState.endsAt) {
+    if (state.pomoState.endsAt <= Date.now()) {
+      await advancePhase();
+      return;
+    }
+    await chrome.alarms.clear(ALARM);
+    chrome.alarms.create(ALARM, { when: state.pomoState.endsAt });
+  }
+  if (state.active) await syncRules(state);
+  else await clearRules();
+}
+
 chrome.runtime.onInstalled.addListener(async () => {
   const state = await getState();
   await syncRules(state);
 });
 
-chrome.runtime.onStartup.addListener(async () => {
-  const state = await getState();
-  if (!state.active) await clearRules();
-  else await syncRules(state);
+chrome.runtime.onStartup.addListener(reconcileOnBoot);
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name !== ALARM) return;
+  await advancePhase();
 });
 
 chrome.storage.onChanged.addListener(async (changes, area) => {
