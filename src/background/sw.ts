@@ -166,6 +166,7 @@ async function reconcileOnBoot(): Promise<void> {
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
+  await clearRules();
   const state = await getState();
   await syncRules(state);
 });
@@ -183,8 +184,14 @@ chrome.storage.onChanged.addListener(async (changes, area) => {
   const prev = changes["jf:state"].oldValue as State | undefined;
   if (!next) return;
   const sitesChanged = JSON.stringify(prev?.sites) !== JSON.stringify(next.sites);
-  if (sitesChanged && next.active) {
+  const activeChanged = prev?.active !== next.active;
+  const phaseChanged = prev?.pomoState.phase !== next.pomoState.phase;
+  const modeChanged = prev?.mode !== next.mode;
+  if (sitesChanged || activeChanged || phaseChanged || modeChanged) {
     await syncRules(next);
+  }
+  if (!next.active && (await chrome.alarms.get(ALARM))) {
+    await chrome.alarms.clear(ALARM);
   }
 });
 

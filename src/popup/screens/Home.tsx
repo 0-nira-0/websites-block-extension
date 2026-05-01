@@ -56,6 +56,8 @@ export default function Home({ goto, tick }: Props) {
     if (state.mode === "pomodoro") {
       if (!state.active) {
         await send({ type: "START_POMODORO" });
+      } else if (state.pomo.strict && state.pomoState.phase === "focus") {
+        return;
       } else {
         await send({ type: "STOP_POMODORO" });
       }
@@ -339,23 +341,38 @@ export default function Home({ goto, tick }: Props) {
       </div>
 
       <div style={{ padding: "14px 18px 18px", borderTop: "1px solid var(--jf-cream-2)" }}>
-        <button
-          onClick={onPrimary}
-          className="jf-btn jf-btn-primary"
-          style={{
-            width: "100%",
-            padding: "14px 18px",
-            fontSize: 14,
-            background: state.active ? "var(--jf-fire)" : "var(--jf-forest)",
-          }}
-        >
-          <Icon name={state.active ? "stop" : "play"} size={14} />
-          {state.active
-            ? "End session"
-            : state.mode === "pomodoro"
-            ? `Start ${state.pomo.focus} min focus`
-            : "Start blocking"}
-        </button>
+        {(() => {
+          const strictLock =
+            state.mode === "pomodoro" && state.active && state.pomo.strict && state.pomoState.phase === "focus";
+          return (
+            <button
+              onClick={onPrimary}
+              disabled={strictLock}
+              className="jf-btn jf-btn-primary"
+              style={{
+                width: "100%",
+                padding: "14px 18px",
+                fontSize: 14,
+                background: strictLock
+                  ? "var(--jf-cream-3)"
+                  : state.active
+                  ? "var(--jf-fire)"
+                  : "var(--jf-forest)",
+                color: strictLock ? "var(--jf-bark-2)" : "var(--jf-cream)",
+                cursor: strictLock ? "not-allowed" : "pointer",
+              }}
+            >
+              <Icon name={state.active ? "stop" : "play"} size={14} />
+              {strictLock
+                ? "strict · ride it out"
+                : state.active
+                ? "End session"
+                : state.mode === "pomodoro"
+                ? `Start ${state.pomo.focus} min focus`
+                : "Start blocking"}
+            </button>
+          );
+        })()}
       </div>
     </>
   );
