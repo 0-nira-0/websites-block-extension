@@ -3,6 +3,7 @@ import Icon from "../components/Icon";
 import ModeTabs from "../components/ModeTabs";
 import SiteRow from "../components/SiteRow";
 import { useStore } from "../hooks/useStore";
+import { useActiveTab } from "../hooks/useActiveTab";
 import { send } from "../../lib/messages";
 import { formatMMSS } from "../../lib/time";
 import type { Mode } from "../../lib/types";
@@ -11,8 +12,28 @@ type Props = { goto: (s: string) => void; tick: number };
 
 export default function Home({ goto, tick }: Props) {
   const { state, set, update } = useStore();
+  const activeTab = useActiveTab();
   const blockedCount = useMemo(() => state.sites.filter((s) => s.enabled).length, [state.sites]);
   const visible = state.sites.slice(0, 6);
+  const alreadyBlocked = useMemo(() => {
+    if (!activeTab) return false;
+    return state.sites.some((s) => s.url === activeTab.host && s.enabled);
+  }, [activeTab, state.sites]);
+
+  const blockCurrent = () => {
+    if (!activeTab) return;
+    update((s) => {
+      const existing = s.sites.find((x) => x.url === activeTab.host);
+      if (existing) {
+        return { ...s, sites: s.sites.map((x) => (x.id === existing.id ? { ...x, enabled: true } : x)) };
+      }
+      const id = `c-${Date.now()}`;
+      return {
+        ...s,
+        sites: [...s.sites, { id, url: activeTab.host, name: activeTab.host, enabled: true, preset: false }],
+      };
+    });
+  };
 
   const remaining = state.pomoState.endsAt
     ? Math.max(0, state.pomoState.endsAt - Date.now())
@@ -230,6 +251,54 @@ export default function Home({ goto, tick }: Props) {
               {state.pomo.focus} / {state.pomo.short} / {state.pomo.long} · {state.pomo.rounds} rounds
             </span>
             <span style={{ color: "var(--jf-leaf)" }}>tune →</span>
+          </button>
+        </div>
+      )}
+
+      {activeTab && (
+        <div
+          style={{
+            margin: "0 18px 10px",
+            padding: "10px 12px",
+            borderRadius: 10,
+            background: "var(--jf-cream-2)",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <Icon name="globe" size={16} color="var(--jf-leaf)" />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontFamily: "var(--jf-font-mono)",
+                color: "var(--jf-leaf)",
+                letterSpacing: "0.05em",
+              }}
+            >
+              currently on
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: "var(--jf-bark)",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {activeTab.host}
+            </div>
+          </div>
+          <button
+            className="jf-btn jf-btn-outline"
+            style={{ padding: "6px 10px", fontSize: 11 }}
+            disabled={alreadyBlocked}
+            onClick={blockCurrent}
+          >
+            <Icon name="plus" size={11} /> {alreadyBlocked ? "blocked" : "block"}
           </button>
         </div>
       )}
