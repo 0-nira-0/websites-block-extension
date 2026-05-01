@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Home from "./screens/Home";
+import Blocklist from "./screens/Blocklist";
+import PomodoroSettings from "./screens/PomodoroSettings";
 import { useStore } from "./hooks/useStore";
 import { applyTheme } from "../lib/time";
 
@@ -38,6 +40,8 @@ export default function App() {
       }}
     >
       {screen === "home" && <Home goto={goto} tick={tick} />}
+      {screen === "blocklist" && <Blocklist goto={goto} />}
+      {screen === "pomo" && <PomodoroSettings goto={goto} />}
     </div>
   );
 }
