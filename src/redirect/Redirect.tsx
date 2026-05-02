@@ -260,7 +260,7 @@ export default function Redirect() {
               loop
               muted
               playsInline
-              controls={false}
+              controls
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", border: 0 }}
             />
           </div>
