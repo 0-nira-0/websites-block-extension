@@ -6,7 +6,7 @@ function normalizeUrl(raw: string): string {
   let v = raw.trim().toLowerCase();
   v = v.replace(/^https?:\/\//, "");
   v = v.replace(/^www\./, "");
-  v = v.replace(/\/.*$/, "");
+  v = v.replace(/[\/?#].*$/, "");
   return v;
 }
 
@@ -14,8 +14,9 @@ function ruleIdFor(index: number): number {
   return RULE_ID_OFFSET + index;
 }
 
-function redirectUrl(): string {
-  return chrome.runtime.getURL("src/redirect/index.html");
+function redirectUrl(host: string): string {
+  const base = chrome.runtime.getURL("src/redirect/index.html");
+  return `${base}?host=${encodeURIComponent(host)}`;
 }
 
 export async function clearRules(): Promise<void> {
@@ -29,22 +30,24 @@ export async function clearRules(): Promise<void> {
 
 export async function applyRules(sites: Site[]): Promise<void> {
   const enabled = sites.filter((s) => s.enabled && s.url);
-  const newRules: chrome.declarativeNetRequest.Rule[] = enabled.map((site, idx) => {
+  const seen = new Set<string>();
+  const newRules: chrome.declarativeNetRequest.Rule[] = [];
+  enabled.forEach((site) => {
     const host = normalizeUrl(site.url);
-    return {
-      id: ruleIdFor(idx),
+    if (!host || seen.has(host)) return;
+    seen.add(host);
+    newRules.push({
+      id: ruleIdFor(newRules.length),
       priority: 1,
       action: {
         type: chrome.declarativeNetRequest.RuleActionType.REDIRECT,
-        redirect: {
-          regexSubstitution: `${redirectUrl()}?from=\\0&host=${encodeURIComponent(host)}`,
-        },
+        redirect: { url: redirectUrl(host) },
       },
       condition: {
-        regexFilter: `^https?://([^/]*\\.)?${host.replace(/\./g, "\\.")}(/.*)?$`,
+        urlFilter: `||${host}^`,
         resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME],
       },
-    };
+    });
   });
   const existing = await chrome.declarativeNetRequest.getDynamicRules();
   await chrome.declarativeNetRequest.updateDynamicRules({

@@ -10,7 +10,7 @@ export const defaultState = (): State => ({
   pomo: { ...DEFAULT_POMO },
   pomoState: { ...DEFAULT_POMO_STATE },
   theme: "system",
-  redirectTone: "goggins",
+  redirectTone: "soft",
   notifications: true,
   sound: true,
   seenOnboarding: false,

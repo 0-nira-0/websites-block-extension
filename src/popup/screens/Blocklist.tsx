@@ -11,7 +11,7 @@ function normalize(input: string): string {
   let v = input.trim().toLowerCase();
   v = v.replace(/^https?:\/\//, "");
   v = v.replace(/^www\./, "");
-  v = v.replace(/\/.*$/, "");
+  v = v.replace(/[\/?#].*$/, "");
   return v;
 }
 

@@ -28,7 +28,6 @@ export default function Redirect() {
   const [state, setStateLocal] = useState<State>(defaultState());
   const [params] = useState(readParams);
   const [now, setNow] = useState(new Date());
-  const [unlockSeconds, setUnlockSeconds] = useState(60);
 
   useEffect(() => {
     getState().then((s) => {
@@ -54,17 +53,14 @@ export default function Redirect() {
     return () => window.clearInterval(t);
   }, []);
 
-  useEffect(() => {
-    if (unlockSeconds <= 0) return;
-    const t = window.setTimeout(() => setUnlockSeconds((s) => s - 1), 1000);
-    return () => window.clearTimeout(t);
-  }, [unlockSeconds]);
-
   const tone = state.redirectTone;
   const copy = TONE_COPY[tone] || TONE_COPY.goggins;
-  const videoId = MOTIVATION_VIDEOS[tone] || MOTIVATION_VIDEOS.goggins;
+  const showVideo = tone === "goggins";
+  const gogginsVideos = MOTIVATION_VIDEOS.goggins;
+  const videoId = showVideo
+    ? gogginsVideos[(state.stats.blocksToday || 0) % gogginsVideos.length]
+    : "";
   const accent = tone === "soft" ? "#6b8e5a" : tone === "humor" ? "#d4922f" : "#ff3d00";
-  const accentDeep = tone === "soft" ? "#3d5c3a" : tone === "humor" ? "#a5731f" : "#c42d00";
 
   const hh = String(now.getHours()).padStart(2, "0");
   const mm = String(now.getMinutes()).padStart(2, "0");
@@ -72,17 +68,14 @@ export default function Redirect() {
 
   const stripeColor = useMemo(() => accent, [accent]);
 
-  const onUnlock = () => {
-    if (unlockSeconds > 0) return;
-    if (params.from) window.location.href = params.from;
-  };
-
   const onBack = () => {
     if (history.length > 1) history.back();
     else window.close();
   };
 
-  const embedSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0`;
+  const embedSrc = videoId
+    ? `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&playsinline=1`
+    : "";
 
   return (
     <div
@@ -145,31 +138,29 @@ export default function Redirect() {
         >
           blocked at {hh}:{mm}:{ss} · session {String(state.stats.sessionCount || 1).padStart(2, "0")}
         </div>
-        <button
-          className="jf-btn"
-          onClick={onUnlock}
+        <span
           style={{
-            background: "transparent",
-            color: unlockSeconds > 0 ? "#666" : accent,
+            color: accent,
             fontSize: 11,
             fontFamily: "var(--jf-font-mono)",
             textTransform: "uppercase",
             letterSpacing: "0.1em",
-            cursor: unlockSeconds > 0 ? "not-allowed" : "pointer",
           }}
         >
-          {unlockSeconds > 0 ? `unlock (${unlockSeconds}s)` : "unlock →"}
-        </button>
+          locked
+        </span>
       </div>
 
       <div
         style={{
           flex: 1,
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: showVideo ? "1fr 1fr" : "1fr",
           gap: 48,
           padding: "40px 60px",
           alignItems: "center",
+          justifyItems: showVideo ? "stretch" : "center",
+          textAlign: showVideo ? "left" : "center",
         }}
       >
         <div>
@@ -219,7 +210,7 @@ export default function Redirect() {
             )}
           </div>
 
-          <div style={{ marginTop: 28, display: "flex", gap: 12 }}>
+          <div style={{ marginTop: 28, display: "flex", gap: 12, justifyContent: showVideo ? "flex-start" : "center" }}>
             <button
               onClick={onBack}
               className="jf-btn"
@@ -235,27 +226,11 @@ export default function Redirect() {
             >
               {copy.primary}
             </button>
-            <button
-              onClick={onUnlock}
-              className="jf-btn"
-              style={{
-                background: "transparent",
-                color: unlockSeconds > 0 ? "#666" : accentDeep,
-                padding: "14px 18px",
-                fontSize: 12,
-                fontFamily: "var(--jf-font-mono)",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                border: `1px solid ${unlockSeconds > 0 ? "#333" : accentDeep}`,
-                cursor: unlockSeconds > 0 ? "not-allowed" : "pointer",
-              }}
-            >
-              {unlockSeconds > 0 ? `${copy.secondary.replace("60s", `${unlockSeconds}s`)}` : "unlock now"}
-            </button>
           </div>
         </div>
 
-        <div style={{ position: "relative" }}>
+        {showVideo && (
+        <div style={{ position: "relative", width: "100%" }}>
           <div
             style={{
               position: "absolute",
@@ -286,6 +261,7 @@ export default function Redirect() {
               title="motivation"
               src={embedSrc}
               allow="autoplay; encrypted-media; picture-in-picture"
+              referrerPolicy="strict-origin-when-cross-origin"
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
             />
           </div>
@@ -301,6 +277,7 @@ export default function Redirect() {
             video plays automatically · muted by default · click to unmute
           </div>
         </div>
+        )}
       </div>
 
       <div
