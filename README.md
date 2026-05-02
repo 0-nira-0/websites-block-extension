@@ -1,6 +1,6 @@
 # just focus
 
-Chrome extension that blocks distracting sites and redirects them to a motivational page with an embedded YouTube video. Two modes: simple block, and Pomodoro (configurable focus / short break / long break / rounds).
+Chrome extension that blocks distracting sites. Two modes: simple block, and Pomodoro (configurable focus / short break / long break / rounds).
 
 ## Build
 
@@ -19,14 +19,6 @@ Output goes to `dist/`.
 4. Select the `dist/` folder
 
 To pick up code changes, run `npm run build` again and click the reload icon on the extension card.
-
-## Develop
-
-```
-npm run dev
-```
-
-Vite serves the popup with HMR. Reload the extension after changes to the service worker or manifest.
 
 ## Stack
 
