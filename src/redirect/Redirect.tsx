@@ -193,9 +193,9 @@ export default function Redirect() {
               color: "#999",
               maxWidth: 460,
               lineHeight: 1.6,
-              textAlign: "center",
-              marginLeft: "auto",
-              marginRight: "auto",
+              textAlign: showVideo ? "left" : "center",
+              marginLeft: showVideo ? 0 : "auto",
+              marginRight: showVideo ? 0 : "auto",
             }}
           >
             {copy.subline}
