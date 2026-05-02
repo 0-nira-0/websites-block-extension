@@ -27,7 +27,7 @@ export type PomoConfig = {
   strict: boolean;
 };
 
-export type RedirectTone = "soft" | "goggins" | "humor";
+export type RedirectTone = "soft" | "goggins";
 export type Theme = "light" | "dark" | "system";
 
 export type Stats = {

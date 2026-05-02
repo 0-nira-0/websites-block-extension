@@ -25,7 +25,11 @@ export async function getState(): Promise<State> {
     await chrome.storage.local.set({ [KEY]: init });
     return init;
   }
-  return { ...defaultState(), ...stored, pomo: { ...DEFAULT_POMO, ...(stored.pomo ?? {}) }, pomoState: { ...DEFAULT_POMO_STATE, ...(stored.pomoState ?? {}) }, stats: { ...DEFAULT_STATS, ...(stored.stats ?? {}) } };
+  const merged = { ...defaultState(), ...stored, pomo: { ...DEFAULT_POMO, ...(stored.pomo ?? {}) }, pomoState: { ...DEFAULT_POMO_STATE, ...(stored.pomoState ?? {}) }, stats: { ...DEFAULT_STATS, ...(stored.stats ?? {}) } };
+  if (merged.redirectTone !== "soft" && merged.redirectTone !== "goggins") {
+    merged.redirectTone = "soft";
+  }
+  return merged;
 }
 
 export async function setState(patch: Partial<State>): Promise<State> {

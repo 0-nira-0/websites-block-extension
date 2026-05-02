@@ -8,7 +8,6 @@ type Props = { goto: (s: string) => void };
 const TONES: Array<{ id: RedirectTone; t: string; d: string }> = [
   { id: "soft", t: "soft", d: "gentle nudges, breathing reminders" },
   { id: "goggins", t: "goggins", d: "yells. video. no mercy." },
-  { id: "humor", t: "humor", d: "memes & light jabs" },
 ];
 
 const THEMES: Theme[] = ["light", "dark", "system"];

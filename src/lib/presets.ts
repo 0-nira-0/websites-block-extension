@@ -51,13 +51,4 @@ export const TONE_COPY: Record<string, { eyebrow: string; line1: string; line2: 
     secondary: "open anyway · 60s",
     subline: "you set this boundary earlier. honor it. one breath in, one breath out, and back to the thing that matters.",
   },
-  humor: {
-    eyebrow: "lol no",
-    line1: "absolutely",
-    line2: "not",
-    line3: "today.",
-    primary: "← fine, i'll work",
-    secondary: "i'm weak · 60s",
-    subline: "you blocked this for a reason and that reason was you, drinking iced coffee at 9am with main-character energy. let's not.",
-  },
 };

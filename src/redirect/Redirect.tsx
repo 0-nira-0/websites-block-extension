@@ -56,7 +56,7 @@ export default function Redirect() {
   const tone = state.redirectTone;
   const copy = TONE_COPY[tone] || TONE_COPY.goggins;
   const showVideo = tone === "goggins";
-  const accent = tone === "soft" ? "#6b8e5a" : tone === "humor" ? "#d4922f" : "#ff3d00";
+  const accent = tone === "soft" ? "#6b8e5a" : "#ff3d00";
 
   const hh = String(now.getHours()).padStart(2, "0");
   const mm = String(now.getMinutes()).padStart(2, "0");
