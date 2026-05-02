@@ -1,9 +1,40 @@
 import { applyRules, clearRules } from "../lib/rules";
 import { getState, setState, updateState } from "../lib/storage";
 import type { Msg } from "../lib/messages";
-import type { Phase, State } from "../lib/types";
+import type { Phase, Site, State } from "../lib/types";
 
 const ALARM = "pomo";
+
+function normalizeHost(raw: string): string {
+  let v = raw.trim().toLowerCase();
+  v = v.replace(/^https?:\/\//, "");
+  v = v.replace(/^www\./, "");
+  v = v.replace(/[\/?#].*$/, "");
+  return v;
+}
+
+function blockedHostFor(url: string, sites: Site[]): string | null {
+  let host = "";
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+    host = u.hostname.toLowerCase();
+    if (host.startsWith("www.")) host = host.slice(4);
+  } catch {
+    return null;
+  }
+  for (const s of sites) {
+    if (!s.enabled || !s.url) continue;
+    const target = normalizeHost(s.url);
+    if (!target) continue;
+    if (host === target || host.endsWith(`.${target}`)) return target;
+  }
+  return null;
+}
+
+function redirectTargetFor(host: string): string {
+  return `${chrome.runtime.getURL("src/redirect/index.html")}?host=${encodeURIComponent(host)}`;
+}
 
 async function syncRules(state: State): Promise<void> {
   const blockingActive = state.active && (state.mode === "block" || state.pomoState.phase === "focus");
@@ -192,6 +223,22 @@ chrome.storage.onChanged.addListener(async (changes, area) => {
   }
   if (!next.active && (await chrome.alarms.get(ALARM))) {
     await chrome.alarms.clear(ALARM);
+  }
+});
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  const url = changeInfo.url || tab.url;
+  if (!url || !/^https?:\/\//.test(url)) return;
+  const state = await getState();
+  const blockingActive =
+    state.active && (state.mode === "block" || state.pomoState.phase === "focus");
+  if (!blockingActive) return;
+  const matched = blockedHostFor(url, state.sites);
+  if (!matched) return;
+  try {
+    await chrome.tabs.update(tabId, { url: redirectTargetFor(matched) });
+  } catch {
+    /* tab may have closed */
   }
 });
 

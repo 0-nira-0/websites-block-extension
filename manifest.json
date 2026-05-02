@@ -21,14 +21,12 @@
     "notifications"
   ],
   "host_permissions": ["<all_urls>"],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com"
-  },
   "web_accessible_resources": [
     {
       "resources": [
         "src/redirect/index.html",
-        "src/complete/index.html"
+        "src/complete/index.html",
+        "goggins.mp4"
       ],
       "matches": ["<all_urls>"]
     }

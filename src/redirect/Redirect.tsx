@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { defaultState, getState, updateState } from "../lib/storage";
 import { applyTheme } from "../lib/time";
-import { MOTIVATION_VIDEOS, TONE_COPY } from "../lib/presets";
+import { TONE_COPY } from "../lib/presets";
 import type { State } from "../lib/types";
 
 function readParams() {
@@ -56,10 +56,6 @@ export default function Redirect() {
   const tone = state.redirectTone;
   const copy = TONE_COPY[tone] || TONE_COPY.goggins;
   const showVideo = tone === "goggins";
-  const gogginsVideos = MOTIVATION_VIDEOS.goggins;
-  const videoId = showVideo
-    ? gogginsVideos[(state.stats.blocksToday || 0) % gogginsVideos.length]
-    : "";
   const accent = tone === "soft" ? "#6b8e5a" : tone === "humor" ? "#d4922f" : "#ff3d00";
 
   const hh = String(now.getHours()).padStart(2, "0");
@@ -73,9 +69,7 @@ export default function Redirect() {
     else window.close();
   };
 
-  const embedSrc = videoId
-    ? `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&playsinline=1`
-    : "";
+  const videoSrc = showVideo ? chrome.runtime.getURL("goggins.mp4") : "";
 
   return (
     <div
@@ -199,6 +193,9 @@ export default function Redirect() {
               color: "#999",
               maxWidth: 460,
               lineHeight: 1.6,
+              textAlign: "center",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
             {copy.subline}
@@ -257,12 +254,14 @@ export default function Redirect() {
               overflow: "hidden",
             }}
           >
-            <iframe
-              title="motivation"
-              src={embedSrc}
-              allow="autoplay; encrypted-media; picture-in-picture"
-              referrerPolicy="strict-origin-when-cross-origin"
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+            <video
+              src={videoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls={false}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", border: 0 }}
             />
           </div>
           <div
@@ -274,7 +273,7 @@ export default function Redirect() {
               letterSpacing: "0.05em",
             }}
           >
-            video plays automatically · muted by default · click to unmute
+            stay hard. they don't know you yet.
           </div>
         </div>
         )}
