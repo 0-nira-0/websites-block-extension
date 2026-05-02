@@ -170,29 +170,31 @@ export default function Redirect() {
           >
             {copy.eyebrow}
           </div>
+          {(copy.line1 || copy.line2 || copy.line3) && (
+            <div
+              style={{
+                fontFamily: "var(--jf-font-display)",
+                fontSize: 96,
+                lineHeight: 0.92,
+                letterSpacing: "-0.05em",
+                textTransform: "uppercase",
+              }}
+            >
+              {copy.line1}
+              <br />
+              <span style={{ color: accent }}>{copy.line2}</span>
+              <br />
+              {copy.line3}
+            </div>
+          )}
           <div
             style={{
-              fontFamily: "var(--jf-font-display)",
-              fontSize: 96,
-              lineHeight: 0.92,
-              letterSpacing: "-0.05em",
-              textTransform: "uppercase",
-            }}
-          >
-            {copy.line1}
-            <br />
-            <span style={{ color: accent }}>{copy.line2}</span>
-            <br />
-            {copy.line3}
-          </div>
-          <div
-            style={{
-              marginTop: 24,
+              marginTop: copy.line1 || copy.line2 || copy.line3 ? 24 : 0,
               fontFamily: "var(--jf-font-mono)",
-              fontSize: 13,
-              color: "#999",
-              maxWidth: 460,
-              lineHeight: 1.6,
+              fontSize: copy.line1 || copy.line2 || copy.line3 ? 13 : 22,
+              color: copy.line1 || copy.line2 || copy.line3 ? "#999" : "#fff",
+              maxWidth: 540,
+              lineHeight: 1.5,
               textAlign: showVideo ? "left" : "center",
               marginLeft: showVideo ? 0 : "auto",
               marginRight: showVideo ? 0 : "auto",

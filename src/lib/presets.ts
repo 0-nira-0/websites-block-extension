@@ -35,9 +35,9 @@ export const defaultSites = (): Site[] =>
 export const TONE_COPY: Record<string, { eyebrow: string; line1: string; line2: string; line3: string; primary: string; secondary: string; subline: string }> = {
   goggins: {
     eyebrow: "⚠ access denied",
-    line1: "Who's gonna",
-    line2: "carry",
-    line3: "the boats?",
+    line1: "",
+    line2: "",
+    line3: "",
     primary: "← get back to work",
     secondary: "i really need this · 60s",
     subline: "you opened a tab to scroll. you don't need that dopamine hit. you blocked this site for a reason. remember the reason.",
