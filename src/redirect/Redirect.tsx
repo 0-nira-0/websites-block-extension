@@ -6,17 +6,7 @@ import type { State } from "../lib/types";
 
 function readParams() {
   const sp = new URLSearchParams(window.location.search);
-  const from = sp.get("from") || "";
-  const host = sp.get("host") || "";
-  let displayHost = host;
-  if (!displayHost && from) {
-    try {
-      displayHost = new URL(from).hostname;
-    } catch {
-      displayHost = from;
-    }
-  }
-  return { from, host: displayHost };
+  return { host: sp.get("host") || "" };
 }
 
 function todayKey(): string {
@@ -198,12 +188,13 @@ export default function Redirect() {
               textAlign: showVideo ? "left" : "center",
               marginLeft: showVideo ? 0 : "auto",
               marginRight: showVideo ? 0 : "auto",
+              whiteSpace: "pre-line",
             }}
           >
             {copy.subline}
             {params.host && (
               <>
-                <br />
+                {"\n"}
                 <span style={{ color: accent }}>{params.host}</span> is on your blocklist.
               </>
             )}
